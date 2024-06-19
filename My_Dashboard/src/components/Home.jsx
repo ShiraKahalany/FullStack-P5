@@ -1,38 +1,29 @@
-// src/components/Home.jsx
+// src/components/Home/Home.jsx
 import React from 'react';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
+import Navbar from './NavBar';
+import AuthContext from '../contexts/AuthContext';
 
-function Home() {
+const Home = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('user'));
+  const { user } = React.useContext(AuthContext);
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
+  React.useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
 
-  if (!user) {
-    navigate('/login');
-    return null;
-  }
+  if (!user) return null;
 
   return (
     <div>
-      <header>
-        <h1>Welcome, {user.name}</h1>
-        <nav>
-          <Link to="info">Info</Link>
-          <Link to="todos">Todos</Link>
-          <Link to="posts">Posts</Link>
-          <Link to="albums">Albums</Link>
-          <button onClick={handleLogout}>Logout</button>
-        </nav>
-      </header>
+      <Navbar />
       <main>
         <Outlet />
       </main>
     </div>
   );
-}
+};
 
 export default Home;
