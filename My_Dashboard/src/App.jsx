@@ -7,6 +7,7 @@ import Home from './components/Home';
 import Todos from './components/Todos';
 import Posts from './components/Posts';
 import Albums from './components/Albums';
+import Info from './components/Info';
 import { AuthProvider } from './contexts/AuthContext';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
             <Route path="todos" element={<Todos />} />
             <Route path="posts" element={<Posts />} />
             <Route path="albums" element={<Albums />} />
+            <Route path="info" element={<Info />} />
           </Route>
           <Route path="/" element={<Login />} />
         </Routes>
