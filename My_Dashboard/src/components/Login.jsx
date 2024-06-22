@@ -18,6 +18,8 @@ const Login = () => {
       const response = await axios.get(`http://localhost:3000/users?username=${username}`);
       const user = response.data[0];
       if (user && user.website === password) {
+        console.log('User logged in:', user);
+        console.log(user.website);
         setUser(user);
         localStorage.setItem('user', JSON.stringify(user));
         navigate('/home');
@@ -36,7 +38,8 @@ const Login = () => {
       {error && <p className="error-message">{error}</p>}
       <form onSubmit={handleLogin}>
         <div className="form-group">
-          <label htmlFor="username">Username</label>
+          <label htmlFor="username">
+          </label>
           <input
             type="text"
             id="username"

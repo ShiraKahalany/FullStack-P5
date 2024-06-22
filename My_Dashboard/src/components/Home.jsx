@@ -3,6 +3,7 @@ import React from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Navbar from './NavBar';
 import AuthContext from '../contexts/AuthContext';
+// import '../css/Home.css'; // Import the CSS for styling
 
 const Home = () => {
   const navigate = useNavigate();
