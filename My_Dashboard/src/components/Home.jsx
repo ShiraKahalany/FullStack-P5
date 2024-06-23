@@ -2,7 +2,11 @@ import React, { useContext, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './NavBar';
 import AuthContext from '../contexts/AuthContext';
+<<<<<<< HEAD
 import '../css/Home.css';
+=======
+// import '../css/Home.css'; // Import the CSS for styling
+>>>>>>> 67536add1f48c65c4c3cf50408e01d60378c709f
 
 const Home = () => {
   const navigate = useNavigate();

@@ -8,6 +8,7 @@ import Todos from './components/Todos';
 import Posts from './components/Posts';
 import Albums from './components/Albums';
 import Info from './components/Info';
+import CompleteProfile from './components/CompleteProfile';
 import { AuthProvider } from './contexts/AuthContext';
 
 function App() {
@@ -17,11 +18,12 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/completeProfile" element={<CompleteProfile />} />
           <Route path="/home" element={<Home />}>
-            <Route path="todos" element={<Todos />} />
-            <Route path="posts" element={<Posts />} />
-            <Route path="albums" element={<Albums />} />
-            <Route path="info" element={<Info />} />
+          <Route path="todos" element={<Todos />} />
+          <Route path="posts" element={<Posts />} />
+          <Route path="albums" element={<Albums />} />
+          <Route path="info" element={<Info />} />
           </Route>
           <Route path="/" element={<Login />} />
         </Routes>

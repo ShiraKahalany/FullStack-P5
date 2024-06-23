@@ -1,69 +1,63 @@
-// src/components/Register.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 
-function Register() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordVerify, setPasswordVerify] = useState('');
+const Register = () => {
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    passwordVerify: ''
+  });
   const navigate = useNavigate();
 
-  const handleRegister = async (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (password !== passwordVerify) {
-      alert('Passwords do not match');
+    if (formData.password !== formData.passwordVerify) {
+      alert("Passwords do not match");
       return;
     }
 
-    try {
-      const response = await axios.get(`http://localhost:5000/users?username=${username}`);
-      if (response.data.length > 0) {
-        alert('Username already exists');
-        return;
-      }
-
-      const newUser = {
-        username,
-        website: password
-      };
-
-      await axios.post('http://localhost:5000/users', newUser);
-      localStorage.setItem('user', JSON.stringify(newUser));
-      navigate('/home');
-    } catch (error) {
-      console.error('Registration error:', error);
-    }
+    // Check if username already exists on the server
+    fetch('http://localhost:3000/users?username=' + formData.username)
+      .then(response => response.json())
+      .then(users => {
+        if (users.length > 0) {
+          alert('Username already exists');
+        } else {
+          // Proceed to complete profile details
+          navigate('/completeProfile', { state: { username: formData.username, password: formData.password } });
+        }
+      })
+      .catch(error => console.error('Error:', error));
   };
 
   return (
     <div>
-      <form onSubmit={handleRegister}>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Verify Password"
-          value={passwordVerify}
-          onChange={(e) => setPasswordVerify(e.target.value)}
-          required
-        />
+      <h2>Register</h2>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>Username:</label>
+          <input type="text" name="username" value={formData.username} onChange={handleChange} required />
+        </div>
+        <div>
+          <label>Password:</label>
+          <input type="password" name="password" value={formData.password} onChange={handleChange} required />
+        </div>
+        <div>
+          <label>Verify Password:</label>
+          <input type="password" name="passwordVerify" value={formData.passwordVerify} onChange={handleChange} required />
+        </div>
         <button type="submit">Register</button>
       </form>
     </div>
   );
-}
+};
 
 export default Register;
