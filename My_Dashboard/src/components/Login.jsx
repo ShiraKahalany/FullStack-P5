@@ -18,8 +18,8 @@ const Login = () => {
       const response = await axios.get(`http://localhost:3000/users?username=${username}`);
       const user = response.data[0];
       if (user && user.website === password) {
-        console.log('User logged in:', user);
-        console.log(user.website);
+        // console.log('User logged in:', user);
+        // console.log(user.website);
         setUser(user);
         localStorage.setItem('user', JSON.stringify(user));
         navigate('/home');
@@ -59,6 +59,7 @@ const Login = () => {
           />
         </div>
         <button type="submit" className="submit-button">Login</button>
+        <p>Don't have an account? <a href="/register">Register</a></p>
       </form>
     </div>
   );
