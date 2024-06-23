@@ -1,6 +1,7 @@
 // src/components/Posts.jsx
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import { FaEdit, FaTrash, FaComments, FaSave, FaPlus, FaSearch } from 'react-icons/fa';
 import AuthContext from '../contexts/AuthContext';
 import '../css/Posts.css';
 
@@ -13,6 +14,9 @@ const Posts = () => {
   const [newPostBody, setNewPostBody] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [newComment, setNewComment] = useState('');
+  const [editMode, setEditMode] = useState(false);
+  const [updatedPostTitle, setUpdatedPostTitle] = useState('');
+  const [updatedPostBody, setUpdatedPostBody] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -44,10 +48,12 @@ const Posts = () => {
 
   const handleAddPost = async () => {
     try {
+      const new_id = posts.length > 0 ? posts[posts.length - 1].id + 1 : 1;
       const response = await axios.post('http://localhost:3000/posts', {
-        userId: user.id,
+        id: new_id,
         title: newPostTitle,
         body: newPostBody,
+        userId: user.id,
       });
       setPosts([...posts, response.data]);
       setNewPostTitle('');
@@ -61,6 +67,10 @@ const Posts = () => {
     try {
       await axios.delete(`http://localhost:3000/posts/${postId}`);
       setPosts(posts.filter(post => post.id !== postId));
+      if (selectedPost && selectedPost.id === postId) {
+        setSelectedPost(null);
+        setComments([]);
+      }
     } catch (err) {
       console.error('Error deleting post', err);
     }
@@ -68,6 +78,7 @@ const Posts = () => {
 
   const handleSelectPost = async (post) => {
     setSelectedPost(post);
+    setEditMode(false);
     try {
       const response = await axios.get(`http://localhost:3000/comments?postId=${post.id}`);
       setComments(response.data);
@@ -76,15 +87,27 @@ const Posts = () => {
     }
   };
 
+  const handleUpdatePost = async () => {
+    try {
+      const response = await axios.put(`http://localhost:3000/posts/${selectedPost.id}`, {
+        title: updatedPostTitle,
+        body: updatedPostBody,
+        userId: user.id,
+      });
+      setPosts(posts.map(post => (post.id === selectedPost.id ? response.data : post)));
+      setEditMode(false);
+    } catch (err) {
+      console.error('Error updating post', err);
+    }
+  };
+
   const handleAddComment = async () => {
     try {
-      const commentsNum = axios.get('http://localhost:3000/comments').length + 1;
       const response = await axios.post('http://localhost:3000/comments', {
+        body: newComment,
         postId: selectedPost.id,
-        id : commentsNum ,
         name: user.username,
         email: user.email,
-        body: newComment,
       });
       setComments([...comments, response.data]);
       setNewComment('');
@@ -102,6 +125,14 @@ const Posts = () => {
     }
   };
 
+  const toggleEditMode = () => {
+    setEditMode(!editMode);
+    if (!editMode) {
+      setUpdatedPostTitle(selectedPost.title);
+      setUpdatedPostBody(selectedPost.body);
+    }
+  };
+
   return (
     <div className="posts-container">
       <h2>Posts</h2>
@@ -112,7 +143,7 @@ const Posts = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <button onClick={handleSearch}>Search</button>
+        <button onClick={handleSearch}><FaSearch /></button>
       </div>
       <div className="add-post">
         <input
@@ -126,23 +157,45 @@ const Posts = () => {
           value={newPostBody}
           onChange={(e) => setNewPostBody(e.target.value)}
         />
-        <button onClick={handleAddPost}>Add Post</button>
+        <button onClick={handleAddPost}><FaPlus /> Add Post</button>
       </div>
       <ul className="posts-list">
         {posts.map(post => (
           <li key={post.id} className={selectedPost && selectedPost.id === post.id ? 'selected' : ''}>
             <div className="post-item">
               <span>{post.id}. {post.title}</span>
-              <button onClick={() => handleSelectPost(post)}>Select</button>
-              <button onClick={() => handleDeletePost(post.id)}>Delete</button>
+              <div className="post-actions">
+                <button onClick={() => handleSelectPost(post)}><FaComments /></button>
+                <button onClick={() => handleDeletePost(post.id)}><FaTrash /></button>
+              </div>
             </div>
           </li>
         ))}
       </ul>
       {selectedPost && (
         <div className="selected-post">
-          <h3>{selectedPost.title}</h3>
-          <p>{selectedPost.body}</p>
+          <h3>
+            {!editMode ? selectedPost.title : (
+              <input
+                type="text"
+                value={updatedPostTitle}
+                onChange={(e) => setUpdatedPostTitle(e.target.value)}
+              />
+            )}
+          </h3>
+          <p>
+            {!editMode ? selectedPost.body : (
+              <textarea
+                value={updatedPostBody}
+                onChange={(e) => setUpdatedPostBody(e.target.value)}
+              />
+            )}
+          </p>
+          {!editMode ? (
+            <button onClick={toggleEditMode}><FaEdit /> Edit</button>
+          ) : (
+            <button onClick={handleUpdatePost}><FaSave /> Save</button>
+          )}
           <div className="comments-section">
             <h4>Comments</h4>
             <ul className="comments-list">
@@ -150,7 +203,7 @@ const Posts = () => {
                 <li key={comment.id}>
                   <p><strong>{comment.name}</strong>: {comment.body}</p>
                   {comment.email === user.email && (
-                    <button onClick={() => handleDeleteComment(comment.id)}>Delete</button>
+                    <button onClick={() => handleDeleteComment(comment.id)}><FaTrash /></button>
                   )}
                 </li>
               ))}
@@ -160,7 +213,7 @@ const Posts = () => {
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
             />
-            <button onClick={handleAddComment}>Add Comment</button>
+            <button onClick={handleAddComment}><FaPlus /> Add Comment</button>
           </div>
         </div>
       )}
