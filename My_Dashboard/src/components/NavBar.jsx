@@ -19,13 +19,12 @@ function NavBar() {
       </div>
       <div className="navbar-links">
         <Link to="/home/info">Info</Link>
-        <Link to="/home/todos">Todos</Link>
+        <Link to="/home/todos" >Todos</Link>
         <Link to="/home/posts">Posts</Link>
         <Link to="/home/albums">Albums</Link>
       </div>
       {user && (
         <div className="navbar-user">
-          <span>Welcome, {user.name}</span>
           <button onClick={handleLogout}>Logout</button>
         </div>
       )}

@@ -175,7 +175,7 @@ const Albums = () => {
             <div className="photo-display">
               {photos.length > 0 ? (
                 <>
-                  <img src={photos[currentPhotoIndex].url} alt={photos[currentPhotoIndex].title} className="photo" />
+                  <img src={photos[currentPhotoIndex].thumbnailUrl} alt={photos[currentPhotoIndex].title} className="photo" />
                   <p>{photos[currentPhotoIndex].title}</p>
                   <input
                     type="text"

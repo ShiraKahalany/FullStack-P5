@@ -31,32 +31,38 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
-      <h2>Login</h2>
-      {error && <p className="error-message">{error}</p>}
-      <form onSubmit={handleLogin}>
-        <div className="form-group">
-          <label htmlFor="username">Username</label>
+    <div className="login-page">
+      <main role="main" className="main">
+        <h1>Sign In</h1>
+        <h3>Please sign in to continue.</h3>
+        {error && <p className="error-message">{error}</p>}
+        <form onSubmit={handleLogin}>
+          <label htmlFor="username">Username:</label>
           <input
             type="text"
             id="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            placeholder="Enter your Username"
             required
           />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">Password:</label>
           <input
             type="password"
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter your Password"
             required
           />
-        </div>
-        <button type="submit" className="submit-button">Login</button>
-      </form>
+          <div className="wrap">
+            <button type="submit" id="signinSubmit" name="signinSubmit" className="submit-button">
+              Submit
+            </button>
+          </div>
+        </form>
+        <p>Don't have an account? <a href="/register">Create new one</a></p>
+      </main>
     </div>
   );
 };

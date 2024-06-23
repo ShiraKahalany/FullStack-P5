@@ -1,10 +1,53 @@
-function Info(){
-    return(
-        <div className="info">
-            <h1>Info</h1>
-            <p>This is the Info page</p>
+// src/components/Info.jsx
+import React, { useContext, useState, useEffect } from 'react';
+import AuthContext from '../contexts/AuthContext';
+import axios from 'axios';
+import '../css/Info.css'; // Import the CSS file for styling
+
+const Info = () => {
+  const { user } = useContext(AuthContext);
+  const [userInfo, setUserInfo] = useState(null);
+
+  useEffect(() => {
+    if (user && user.id) {
+      axios.get(`http://localhost:3000/users/${user.id}`)
+        .then(response => {
+          setUserInfo(response.data);
+        })
+        .catch(error => {
+          console.error('There was an error fetching the user data!', error);
+        });
+    }
+  }, [user]);
+
+  if (!userInfo) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div className="info-page">
+      <div className="info-container">
+        <h2>{userInfo.name}'s Information</h2>
+        <div className="info-section">
+          <p><strong>Username:</strong> {userInfo.username}</p>
+          <p><strong>Email:</strong> {userInfo.email}</p>
+          <p><strong>Phone:</strong> {userInfo.phone}</p>
+          <p><strong>Website:</strong> <a href={`http://${userInfo.website}`} target="_blank" rel="noopener noreferrer">{userInfo.website}</a></p>
         </div>
-    )
-}
+        <div className="info-section">
+          <h3>Address</h3>
+          <p>{userInfo.address.street}, {userInfo.address.suite}</p>
+          <p>{userInfo.address.city}, {userInfo.address.zipcode}</p>
+        </div>
+        <div className="info-section">
+          <h3>Company</h3>
+          <p><strong>Name:</strong> {userInfo.company.name}</p>
+          <p><strong>Catch Phrase:</strong> {userInfo.company.catchPhrase}</p>
+          <p><strong>BS:</strong> {userInfo.company.bs}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default Info;
