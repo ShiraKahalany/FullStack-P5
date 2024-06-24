@@ -115,7 +115,7 @@ const Posts = () => {
       const response = await axios.put(`http://localhost:3000/posts/${selectedPost.id}`, {
         title: updatedPostTitle,
         body: updatedPostBody,
-        userId: user.id,
+        userId: parseInt(user.id),
       });
       const updatedPosts = posts.map(post => (post.id === selectedPost.id ? response.data : post));
       setPosts(updatedPosts);
