@@ -65,7 +65,11 @@ const Todos = () => {
       const maxId = allTodos.length > 0 ? Math.max(...allTodos.map(todo => todo.id)) : 0;
       const newTask = {
         userId: parseInt(user.id),
+<<<<<<< HEAD
         id: String(maxId + 1),
+=======
+        id: (maxId + 1).toString(),
+>>>>>>> 8e93a325a92c0f65f3a8466d011b8b2086065f6a
         title: newTaskTitle,
         completed: false
       };
@@ -143,20 +147,22 @@ const Todos = () => {
   };
 
   return (
-    <div>
+    <div className="todos-container">
       <h2>Todos List for {user.name}</h2>
       
       {/* Sort dropdown */}
-      <label htmlFor="sort">Sort by:</label>
-      <select id="sort" value={sortBy} onChange={handleSortChange}>
-        <option value="serial">Serial</option>
-        <option value="performance">Performance</option>
-        <option value="alphabetical">Alphabetical</option>
-        <option value="random">Random</option>
-      </select>
+      <div className="sort-container">
+        <label htmlFor="sort">Sort by:</label>
+        <select id="sort" value={sortBy} onChange={handleSortChange}>
+          <option value="serial">Serial</option>
+          <option value="performance">Performance</option>
+          <option value="alphabetical">Alphabetical</option>
+          <option value="random">Random</option>
+        </select>
+      </div>
 
       {/* Search fields */}
-      <div>
+      <div className="search-container">
         <input
           type="text"
           placeholder="Search by title"
@@ -171,28 +177,28 @@ const Todos = () => {
       </div>
 
       {/* Add new task */}
-      <div>
+      <div className="add-task-container">
         <input
           type="text"
           placeholder="Enter task title"
           value={newTaskTitle}
           onChange={handleTaskTitleChange}
         />
-        <button onClick={handleAddTask}>Add Task</button>
+        <button onClick={handleAddTask} className="add-task-button">Add Task</button>
       </div>
 
       {/* List of todos */}
-      <ul>
+      <ul className="todos-list">
         {todos.map(todo => (
-          <li key={todo.id}>
+          <li key={todo.id} className="todo-item">
             <input
               type="checkbox"
               checked={todo.completed}
               onChange={() => handleStatusChange(todo.id, !todo.completed)}
             />
-            <span>{todo.title}</span>
-            <button onClick={() => handleEditTask(todo)}>Edit</button>
-            <button onClick={() => handleDeleteTask(todo.id)}>Delete</button>
+            <span className={todo.completed ? 'completed' : ''}>{todo.title}</span>
+            <button onClick={() => handleEditTask(todo)} className="edit-button">Edit</button>
+            <button onClick={() => handleDeleteTask(todo.id)} className="delete-button">Delete</button>
           </li>
         ))}
       </ul>
@@ -207,8 +213,8 @@ const Todos = () => {
               value={editedTitle}
               onChange={handleEditTitleChange}
             />
-            <button onClick={handleConfirmEdit}>OK</button>
-            <button onClick={handleCancelEdit}>Cancel</button>
+            <button onClick={handleConfirmEdit} className="confirm-button">OK</button>
+            <button onClick={handleCancelEdit} className="cancel-button">Cancel</button>
           </div>
         </div>
       )}

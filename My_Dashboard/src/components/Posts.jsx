@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { FaEdit, FaTrash, FaComments, FaSave, FaPlus, FaSearch } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaComments, FaSave, FaPlus } from 'react-icons/fa';
 import AuthContext from '../contexts/AuthContext';
 import '../css/Posts.css';
 
@@ -18,6 +18,8 @@ const Posts = () => {
   const [updatedPostTitle, setUpdatedPostTitle] = useState('');
   const [updatedPostBody, setUpdatedPostBody] = useState('');
   const [commentsVisible, setCommentsVisible] = useState(false);
+  const [editCommentId, setEditCommentId] = useState(null);
+  const [updatedComment, setUpdatedComment] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -39,18 +41,31 @@ const Posts = () => {
     }
   };
 
+  // const handleSearch = () => {
+  //   if (searchQuery.trim() === '') {
+  //     setFilteredPosts(posts);
+  //   } else {
+  //     const filtered = posts.filter(
+  //       post =>
+  //         post.id.toString().includes(searchQuery) ||
+  //         post.title.toLowerCase().includes(searchQuery.toLowerCase())
+  //     );
+  //     setFilteredPosts(filtered);
+  //   }
+  // };
+
   const handleSearch = () => {
     if (searchQuery.trim() === '') {
       setFilteredPosts(posts);
     } else {
-      const filtered = posts.filter(
-        post =>
-          post.id.toString().includes(searchQuery) ||
-          post.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const filtered = posts.filter((post, index) => {
+        const serialNumber = (index + 1).toString();
+        return serialNumber.includes(searchQuery) || post.title.toLowerCase().includes(searchQuery.toLowerCase());
+      });
       setFilteredPosts(filtered);
     }
   };
+  
 
   const handleAddPost = async () => {
     try {
@@ -164,7 +179,37 @@ const Posts = () => {
       console.error(`Error deleting comment with ID ${commentId}`, err);
     }
   };
-  
+
+  const handleEditComment = (commentId, body) => {
+    const commentToEdit = comments.find(comment => comment.id === commentId);
+    if (parseInt(commentToEdit.userID) === parseInt(user.id)) {
+      setEditCommentId(commentId);
+      setUpdatedComment(body);
+    } else {
+      alert('You can only edit comments you have written.');
+    }
+  };
+
+  const handleUpdateComment = async (commentId) => {
+    try {
+      const commentResponse = await axios.get(`http://localhost:3000/comments/${commentId}`);
+      const comment = commentResponse.data;
+      const response = await axios.put(`http://localhost:3000/comments/${commentId}`, {
+        ...comment,
+        body: updatedComment
+      });
+      setComments(comments.map(comment => (comment.id === commentId ? response.data : comment)));
+      setEditCommentId(null);
+      setUpdatedComment('');
+    } catch (err) {
+      console.error(`Error updating comment with ID ${commentId}`, err);
+    }
+  };
+
+  const handleCancelEditComment = () => {
+    setEditCommentId(null);
+    setUpdatedComment('');
+  };
 
   const toggleEditMode = () => {
     setEditMode(!editMode);
@@ -247,7 +292,10 @@ const Posts = () => {
           {!editMode ? (
             <button onClick={toggleEditMode}><FaEdit /> Edit</button>
           ) : (
-            <button onClick={handleUpdatePost}><FaSave /> Save</button>
+            <div>
+              <button onClick={handleUpdatePost}><FaSave /> Save</button>
+              <button onClick={toggleEditMode}>Cancel</button>
+            </div>
           )}
           <div className="comments-section">
             <button onClick={toggleCommentsVisibility} className="toggle-comments">
@@ -260,8 +308,27 @@ const Posts = () => {
                   {comments.map(comment => (
                     <li key={comment.id}>
                       <div className="comment-item">
-                        <span>{comment.body}</span>
-                        <button onClick={() => handleDeleteComment(comment.id)}><FaTrash /></button>
+                        {editCommentId === comment.id ? (
+                          <div>
+                            <input
+                              type="text"
+                              value={updatedComment}
+                              onChange={(e) => setUpdatedComment(e.target.value)}
+                            />
+                            <div className='commentCandS'>
+                            <button onClick={() => handleUpdateComment(comment.id)}><FaSave /> Save</button>
+                            <button onClick={handleCancelEditComment}>Cancel</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <span>{comment.body}</span>
+                        )}
+                        {editCommentId !== comment.id && (
+                          <div className='commentsSandE'>
+                            <button onClick={() => handleEditComment(comment.id, comment.body)}><FaEdit /></button>
+                            <button onClick={() => handleDeleteComment(comment.id)}><FaTrash /></button>
+                          </div>
+                        )}
                       </div>
                     </li>
                   ))}
