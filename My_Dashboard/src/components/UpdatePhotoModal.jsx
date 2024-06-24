@@ -1,44 +1,36 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-// import '../css/PhotoModal.css';
-
+import '../css/UpdatePhotoModal.css';
 
 const UpdatePhotoModal = ({ photo, onUpdate, onClose }) => {
-  const [title, setTitle] = useState(photo.title);
-  const [url, setUrl] = useState(photo.url);
+  const [newTitle, setNewTitle] = useState(photo.title);
+  const [newURL, setNewURL] = useState(photo.url);
 
-  const handleUpdate = () => {
-    onUpdate(photo.id, title, url);
+  const handleUpdatePhoto = () => {
+    onUpdate(photo.id, newTitle, newURL);
     onClose();
   };
 
   return (
     <div className="modal-overlay">
-      <div className="modal">
+      <div className="modal-content">
         <h2>Update Photo</h2>
-        <label>Title:</label>
         <input
           type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Photo Title"
+          value={newTitle}
+          onChange={(e) => setNewTitle(e.target.value)}
         />
-        <label>URL:</label>
         <input
           type="text"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          placeholder="Photo URL"
+          value={newURL}
+          onChange={(e) => setNewURL(e.target.value)}
         />
-        <button onClick={handleUpdate}>Update</button>
-        <button onClick={onClose}>Cancel</button>
+        <button onClick={handleUpdatePhoto} className="update-photo-button">Update Photo</button>
+        <button onClick={onClose} className="close-button">Cancel</button>
       </div>
     </div>
   );
-};
-
-UpdatePhotoModal.propTypes = {
-  photo: PropTypes.object.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onUpdate: PropTypes.func.isRequired,
 };
 
 export default UpdatePhotoModal;

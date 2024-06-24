@@ -3,7 +3,7 @@ import axios from 'axios';
 import AuthContext from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faArrowRight, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faArrowRight, faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import albumBackground from '../img/album-background.jpg';
 import emptyAlbum from '../img/empty_album.png';
 import AddPhotoModal from './AddPhotoModel';
@@ -19,10 +19,8 @@ const Albums = () => {
   const [photos, setPhotos] = useState([]);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [newAlbumTitle, setNewAlbumTitle] = useState('');
-  const [newPhoto, setNewPhoto] = useState({ url: '' });
   const [loading, setLoading] = useState(false);
   const [totalPhotos, setTotalPhotos] = useState(0);
-  const [newPhotoTitle, setNewPhotoTitle] = useState('');
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [photoToUpdate, setPhotoToUpdate] = useState(null);
   const [showAddPhotoModal, setShowAddPhotoModal] = useState(false);
@@ -110,38 +108,21 @@ const Albums = () => {
       alert('Please enter an album title.');
       return;
     }
-  
+
     try {
-      // Fetch the running ID
       const { data: runningIdData } = await axios.get('http://localhost:3000/running_id?type=albums_id');
-      console.log('Running ID data:', runningIdData);
-  
-      // Fetch all albums
       const albumsData = await axios.get('http://localhost:3000/albums');
       const allAlbums = albumsData.data;
-      console.log('All albums:', allAlbums);
-  
-      // Calculate the new ID
       const maxId = allAlbums.length > 0 ? Math.max(...allAlbums.map(album => parseInt(album.id, 10))) : 0;
       const newId = maxId + 1;
   
-      // Create the new album data
       const newAlbumData = {
         id: String(newId),  
         userId: parseInt(user.id),  
         title: newAlbumTitle,
       };
-  
-      // Debug log the new album data
-      console.log('New album data:', newAlbumData);
-  
-      // Post the new album
+
       const response = await axios.post('http://localhost:3000/albums', newAlbumData);
-  
-      // Log the response data
-      console.log('Album successfully added:', response.data);
-  
-      // Update the state with the new album
       setAlbums([...albums, response.data]);
       setNewAlbumTitle('');
     } catch (error) {
@@ -149,7 +130,30 @@ const Albums = () => {
       alert('Failed to add album. Please try again later.');
     }
   };
+
+  const handleDeleteAlbum = async (albumId) => {
+    try {
+      const photosResponse = await axios.get(`http://localhost:3000/photos?albumId=${albumId}`);
+      const photosToDelete = photosResponse.data;
   
+      await Promise.all(photosToDelete.map(async (photo) => {
+        try {
+          await axios.delete(`http://localhost:3000/photos/${photo.id}`);
+        } catch (err) {
+          console.error(`Error deleting photo with ID ${photo.id}`, err);
+        }
+      }));
+
+      await axios.delete(`http://localhost:3000/albums/${albumId}`);
+      setAlbums((prevAlbums) => prevAlbums.filter(album => album.id !== albumId));
+      if (selectedAlbum && selectedAlbum.id === albumId) {
+        setSelectedAlbum(null);
+        setPhotos([]);
+      }
+    } catch (err) {
+      console.error('Error deleting album and photos', err);
+    }
+  };
 
   const handleDeletePhoto = async (photoId) => {
     try {
@@ -175,13 +179,6 @@ const Albums = () => {
     }
   };
 
-  const handleImageUrlChange = (e) => {
-    setNewPhoto({
-      ...newPhoto,
-      url: e.target.value,
-    });
-  };
-
   const handleAddPhoto = async (albumId, title, url) => {
     if (url.trim() === '') {
       alert('Please enter a photo URL.');
@@ -202,7 +199,6 @@ const Albums = () => {
 
       await axios.post('http://localhost:3000/photos', newPhotoData);
 
-      // Fetch updated photos
       await fetchTotalPhotos(albumId);
       await fetchPhoto(albumId, totalPhotos);
     } catch (error) {
@@ -225,10 +221,15 @@ const Albums = () => {
         {albums
           .filter(album => album.title.includes(search) || album.id.toString().includes(search))
           .map((album, index) => (
-            <div key={album.id} className="album-card" onClick={() => handleAlbumClick(album)}>
+            <div key={album.id} className="album-card">
               <div className="album-number">{index + 1}</div>
-              <img src={albumBackground} alt={album.title} className="album-image" />
+              <img src={albumBackground} alt={album.title} className="album-image" onClick={() => handleAlbumClick(album)} />
               <div className="album-title">{album.title}</div>
+              <FontAwesomeIcon
+                icon={faTrashAlt}
+                className="delete-album-icon"
+                onClick={() => handleDeleteAlbum(album.id)}
+              />
             </div>
           ))}
       </div>
