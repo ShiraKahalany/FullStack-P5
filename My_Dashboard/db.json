@@ -1,31 +1,4 @@
 {
-  "running_id": [
-    {
-      "type": "users_id",
-      "number": 12,
-      "id": 1000
-    },
-    {
-      "type": "posts_id",
-      "number": 110,
-      "id": 1001
-    },
-    {
-      "type": "albums_id",
-      "number": 110,
-      "id": 1002
-    },
-    {
-      "type": "photos_id",
-      "number": 5010,
-      "id": 1003
-    },
-    {
-      "type": "comments_id",
-      "number": 500,
-      "id": 1004
-    }
-  ],
   "users": [
     {
       "id": "1",
