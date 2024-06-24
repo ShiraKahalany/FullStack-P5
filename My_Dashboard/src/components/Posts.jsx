@@ -138,6 +138,7 @@ const Posts = () => {
       <h2>Posts</h2>
       <div className="search-bar">
         <input
+         className='search-box'
           type="text"
           placeholder="Search by serial number or title"
           value={searchQuery}

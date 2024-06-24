@@ -38,29 +38,32 @@ const Login = () => {
       {error && <p className="error-message">{error}</p>}
       <form onSubmit={handleLogin}>
         <div className="form-group">
-          <label htmlFor="username">
-          </label>
+          <label htmlFor="username">Username:</label>
           <input
             type="text"
             id="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            placeholder="Enter your Username"
             required
           />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">Password:</label>
           <input
             type="password"
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter your Password"
             required
           />
+          <div className="wrap">
+            <button type="submit" id="signinSubmit" name="signinSubmit" className="submit-button">
+              Submit
+            </button>
+          </div>
         </div>
-        <button type="submit" className="submit-button">Login</button>
-        <p>Don't have an account? <a href="/register">Register</a></p>
       </form>
+      <p>Don't have an account? <a href="/register">Create new one</a></p>
     </div>
   );
 };
