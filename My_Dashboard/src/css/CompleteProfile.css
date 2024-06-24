@@ -1,0 +1,72 @@
+/* src/css/CompleteProfile.css */
+
+.complete-profile-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: sans-serif;
+    line-height: 1.5;
+    min-height: 100vh;
+    background-image: linear-gradient(to bottom, rgb(255, 255, 255), rgb(250, 250, 250), #76a1c7);
+    flex-direction: column;
+    margin: 0;
+  }
+  
+  .complete-profile-page .main {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    padding: 10px 20px;
+    transition: transform 0.2s;
+    width: 380px;
+    text-align: center;
+  }
+  
+  .complete-profile-page h1 {
+    color: #76a1c7;
+    font-size: 3em;
+  }
+  
+  .complete-profile-page label {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    text-align: left;
+    color: #555;
+    font-weight: bold;
+  }
+  
+  .complete-profile-page input {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .complete-profile-page a {
+    text-decoration: none;
+  }
+  
+  .complete-profile-page .wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .complete-profile-page .submit-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+  
+  .complete-profile-page .submit-button:hover {
+    background-color: #0056b3;
+  }
+  

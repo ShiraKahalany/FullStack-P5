@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import AuthContext from '../contexts/AuthContext';
 import axios from 'axios';
-
+import '../css/CompleteProfile.css'; // Import the CSS file
 
 const CompleteProfile = () => {
   const navigate = useNavigate();
@@ -88,59 +88,54 @@ const CompleteProfile = () => {
   };
 
   return (
-    <div>
-      <h2>Complete Profile</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Name:</label>
-          <input type="text" name="name" value={profileData.name} onChange={handleChange} required />
-        </div>
-        <div>
-          <label>Email:</label>
-          <input type="email" name="email" value={profileData.email} onChange={handleChange} required />
-        </div>
-        <div>
-          <label>Street:</label>
-          <input type="text" name="address.street" value={profileData.address.street} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Suite:</label>
-          <input type="text" name="address.suite" value={profileData.address.suite} onChange={handleChange} />
-        </div>
-        <div>
-          <label>City:</label>
-          <input type="text" name="address.city" value={profileData.address.city} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Zipcode:</label>
-          <input type="text" name="address.zipcode" value={profileData.address.zipcode} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Latitude:</label>
-          <input type="text" name="address.geo.lat" value={profileData.address.geo.lat} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Longitude:</label>
-          <input type="text" name="address.geo.lng" value={profileData.address.geo.lng} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Phone:</label>
-          <input type="text" name="phone" value={profileData.phone} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Company Name:</label>
-          <input type="text" name="company.name" value={profileData.company.name} onChange={handleChange} />
-        </div>
-        <div>
-          <label>Catch Phrase:</label>
-          <input type="text" name="company.catchPhrase" value={profileData.company.catchPhrase} onChange={handleChange} />
-        </div>
-        <div>
-          <label>BS:</label>
-          <input type="text" name="company.bs" value={profileData.company.bs} onChange={handleChange} />
-        </div>
-        <button type="submit" >Complete Registration</button>
-      </form>
+    <div className="complete-profile-page">
+      <main role="main" className="main">
+        <h1>Complete Profile</h1>
+        <h3>Please fill in the details to complete your profile.</h3>
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="name">Name:</label>
+          <input type="text" id="name" name="name" value={profileData.name} onChange={handleChange} required />
+
+          <label htmlFor="email">Email:</label>
+          <input type="email" id="email" name="email" value={profileData.email} onChange={handleChange} required />
+
+          <label htmlFor="street">Street:</label>
+          <input type="text" id="street" name="address.street" value={profileData.address.street} onChange={handleChange} />
+
+          <label htmlFor="suite">Suite:</label>
+          <input type="text" id="suite" name="address.suite" value={profileData.address.suite} onChange={handleChange} />
+
+          <label htmlFor="city">City:</label>
+          <input type="text" id="city" name="address.city" value={profileData.address.city} onChange={handleChange} />
+
+          <label htmlFor="zipcode">Zipcode:</label>
+          <input type="text" id="zipcode" name="address.zipcode" value={profileData.address.zipcode} onChange={handleChange} />
+
+          <label htmlFor="lat">Latitude:</label>
+          <input type="text" id="lat" name="address.geo.lat" value={profileData.address.geo.lat} onChange={handleChange} />
+
+          <label htmlFor="lng">Longitude:</label>
+          <input type="text" id="lng" name="address.geo.lng" value={profileData.address.geo.lng} onChange={handleChange} />
+
+          <label htmlFor="phone">Phone:</label>
+          <input type="text" id="phone" name="phone" value={profileData.phone} onChange={handleChange} />
+
+          <label htmlFor="companyName">Company Name:</label>
+          <input type="text" id="companyName" name="company.name" value={profileData.company.name} onChange={handleChange} />
+
+          <label htmlFor="catchPhrase">Catch Phrase:</label>
+          <input type="text" id="catchPhrase" name="company.catchPhrase" value={profileData.company.catchPhrase} onChange={handleChange} />
+
+          <label htmlFor="bs">BS:</label>
+          <input type="text" id="bs" name="company.bs" value={profileData.company.bs} onChange={handleChange} />
+
+          <div className="wrap">
+            <button type="submit" id="completeProfileSubmit" name="completeProfileSubmit" className="submit-button">
+              Complete Registration
+            </button>
+          </div>
+        </form>
+      </main>
     </div>
   );
 };
