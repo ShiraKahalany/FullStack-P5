@@ -1,4 +1,3 @@
-// src/components/Login.jsx
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -33,11 +32,12 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
-      <h2>Login</h2>
-      {error && <p className="error-message">{error}</p>}
-      <form onSubmit={handleLogin}>
-        <div className="form-group">
+    <div className="login-page">
+      <main role="main" className="main">
+        <h1>Sign In</h1>
+        <h3>Please sign in to continue.</h3>
+        {error && <p className="error-message">{error}</p>}
+        <form onSubmit={handleLogin}>
           <label htmlFor="username">Username:</label>
           <input
             type="text"
@@ -61,9 +61,9 @@ const Login = () => {
               Submit
             </button>
           </div>
-        </div>
-      </form>
-      <p>Don't have an account? <a href="/register">Create new one</a></p>
+        </form>
+        <p>Don't have an account? <a href="/register">Create new one</a></p>
+      </main>
     </div>
   );
 };

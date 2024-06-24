@@ -139,7 +139,7 @@ const CompleteProfile = () => {
           <label>BS:</label>
           <input type="text" name="company.bs" value={profileData.company.bs} onChange={handleChange} />
         </div>
-        <button type="submit">Complete Registration</button>
+        <button type="submit" >Complete Registration</button>
       </form>
     </div>
   );
