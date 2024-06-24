@@ -64,8 +64,8 @@ const Todos = () => {
       const allTodos = response.data;
       const maxId = allTodos.length > 0 ? Math.max(...allTodos.map(todo => todo.id)) : 0;
       const newTask = {
-        userId: user.id,
-        id: maxId + 1,
+        userId: parseInt(user.id),
+        id: String(maxId + 1),
         title: newTaskTitle,
         completed: false
       };

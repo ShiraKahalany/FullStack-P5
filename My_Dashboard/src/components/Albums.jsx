@@ -110,19 +110,38 @@ const Albums = () => {
       alert('Please enter an album title.');
       return;
     }
-
+  
     try {
+      // Fetch the running ID
       const { data: runningIdData } = await axios.get('http://localhost:3000/running_id?type=albums_id');
-      const maxId = albums.length > 0 ? Math.max(...albums.map(album => album.id)) : 0;
-
+      console.log('Running ID data:', runningIdData);
+  
+      // Fetch all albums
+      const albumsData = await axios.get('http://localhost:3000/albums');
+      const allAlbums = albumsData.data;
+      console.log('All albums:', allAlbums);
+  
+      // Calculate the new ID
+      const maxId = allAlbums.length > 0 ? Math.max(...allAlbums.map(album => parseInt(album.id, 10))) : 0;
+      const newId = maxId + 1;
+  
+      // Create the new album data
       const newAlbumData = {
-        id: maxId + 1,
-        userId: user.id,
+        id: String(newId),  // Ensure id is a string
+        userId: user.id,  // Ensure userId is a number
         title: newAlbumTitle,
       };
+  
+      // Debug log the new album data
+      console.log('New album data:', newAlbumData);
+  
+      // Post the new album
       const response = await axios.post('http://localhost:3000/albums', newAlbumData);
-
+  
+      // Log the response data
       console.log('Album successfully added:', response.data);
+  
+      // Update the state with the new album
       setAlbums([...albums, response.data]);
       setNewAlbumTitle('');
     } catch (error) {
@@ -130,6 +149,7 @@ const Albums = () => {
       alert('Failed to add album. Please try again later.');
     }
   };
+  
 
   const handleDeletePhoto = async (photoId) => {
     try {
