@@ -54,12 +54,14 @@ const Posts = () => {
 
   const handleAddPost = async () => {
     try {
-      const new_id = posts.length > 0 ? posts[posts.length - 1].id + 1 : 1;
+      const postssResponse = await axios.get('http://localhost:3000/posts');
+      const allPosts = postssResponse.data;
+      const maxpostId = allPosts.length > 0 ? Math.max(...allPosts.map(post => parseInt(post.id))) : 0;
       const response = await axios.post('http://localhost:3000/posts', {
-        id: new_id,
+        id: (maxpostId+1).toString(),
         title: newPostTitle,
         body: newPostBody,
-        userId: user.id,
+        userId: parseInt(user.id),
       });
       const newPosts = [...posts, response.data];
       setPosts(newPosts);
@@ -149,12 +151,20 @@ const Posts = () => {
 
   const handleDeleteComment = async (commentId) => {
     try {
-      await axios.delete(`http://localhost:3000/comments/${commentId}`);
-      setComments(comments.filter(comment => comment.id !== commentId));
+      const commentResponse = await axios.get(`http://localhost:3000/comments/${commentId}`);
+      const comment = commentResponse.data;
+      if (parseInt(comment.userID) === parseInt(user.id)) {
+        await axios.delete(`http://localhost:3000/comments/${commentId}`);
+        setComments(comments.filter(comment => comment.id !== commentId));
+      } else {
+        // Display an error message
+        alert('You can only delete comments you have written.');
+      }
     } catch (err) {
       console.error(`Error deleting comment with ID ${commentId}`, err);
     }
   };
+  
 
   const toggleEditMode = () => {
     setEditMode(!editMode);
