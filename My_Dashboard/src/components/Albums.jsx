@@ -127,8 +127,8 @@ const Albums = () => {
   
       // Create the new album data
       const newAlbumData = {
-        id: String(newId),  // Ensure id is a string
-        userId: user.id,  // Ensure userId is a number
+        id: String(newId),  
+        userId: parseInt(user.id),  
         title: newAlbumTitle,
       };
   
