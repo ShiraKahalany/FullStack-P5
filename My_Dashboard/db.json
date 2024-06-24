@@ -1507,7 +1507,7 @@
     {
       "title": "eum et est occaecati",
       "body": "ullam et saepe reiciendis voluptatem adipisci\nsit amet autem assumenda provident rerum culpa\nquis hic commodi nesciunt rem tenetur doloremque ipsam iure\nquis sunt voluptatem rerum illo velit",
-      "userId": "1",
+      "userId": 1,
       "id": "4"
     },
     {
@@ -2085,6 +2085,7 @@
       "id": "100",
       "title": "at nam consequatur ea labore ea harum",
       "body": "cupiditate quo est a modi nesciunt soluta\nipsa voluptas error itaque dicta in\nautem qui minus magnam et distinctio eum\naccusamus ratione error aut"
+<<<<<<< HEAD
     },
     {
       "id": "[object Object]1",
@@ -2109,6 +2110,8 @@
       "title": "",
       "body": "",
       "userId": "1"
+=======
+>>>>>>> aa4a6f5f6c871f86cea857e593fd01a305b06fd0
     }
   ],
   "comments": [

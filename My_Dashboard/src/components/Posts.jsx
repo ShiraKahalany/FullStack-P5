@@ -1,4 +1,3 @@
-// src/components/Posts.jsx
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { FaEdit, FaTrash, FaComments, FaSave, FaPlus, FaSearch } from 'react-icons/fa';
@@ -8,6 +7,7 @@ import '../css/Posts.css';
 const Posts = () => {
   const { user } = useContext(AuthContext);
   const [posts, setPosts] = useState([]);
+  const [filteredPosts, setFilteredPosts] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [newPostTitle, setNewPostTitle] = useState('');
@@ -17,6 +17,7 @@ const Posts = () => {
   const [editMode, setEditMode] = useState(false);
   const [updatedPostTitle, setUpdatedPostTitle] = useState('');
   const [updatedPostBody, setUpdatedPostBody] = useState('');
+  const [commentsVisible, setCommentsVisible] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -24,10 +25,15 @@ const Posts = () => {
     }
   }, [user]);
 
+  useEffect(() => {
+    handleSearch();
+  }, [searchQuery]);
+
   const fetchPosts = async () => {
     try {
       const response = await axios.get(`http://localhost:3000/posts?userId=${user.id}`);
       setPosts(response.data);
+      setFilteredPosts(response.data); // Initialize filteredPosts with all posts
     } catch (err) {
       console.error('Error fetching posts', err);
     }
@@ -35,27 +41,31 @@ const Posts = () => {
 
   const handleSearch = () => {
     if (searchQuery.trim() === '') {
-      fetchPosts();
+      setFilteredPosts(posts);
     } else {
-      const filteredPosts = posts.filter(
+      const filtered = posts.filter(
         post =>
           post.id.toString().includes(searchQuery) ||
           post.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      setPosts(filteredPosts);
+      setFilteredPosts(filtered);
     }
   };
 
   const handleAddPost = async () => {
     try {
-      const new_id = posts.length > 0 ? posts[posts.length - 1].id + 1 : 1;
+      const postssResponse = await axios.get('http://localhost:3000/posts');
+      const allPosts = postssResponse.data;
+      const maxpostId = allPosts.length > 0 ? Math.max(...allPosts.map(post => parseInt(post.id))) : 0;
       const response = await axios.post('http://localhost:3000/posts', {
-        id: new_id,
+        id: (maxpostId+1).toString(),
         title: newPostTitle,
         body: newPostBody,
-        userId: user.id,
+        userId: parseInt(user.id),
       });
-      setPosts([...posts, response.data]);
+      const newPosts = [...posts, response.data];
+      setPosts(newPosts);
+      setFilteredPosts(newPosts); // Update filteredPosts as well
       setNewPostTitle('');
       setNewPostBody('');
     } catch (err) {
@@ -65,26 +75,39 @@ const Posts = () => {
 
   const handleDeletePost = async (postId) => {
     try {
+      // Fetch all comments for the post
+      const commentsResponse = await axios.get(`http://localhost:3000/comments?postId=${postId}`);
+      const commentsToDelete = commentsResponse.data;
+  
+      // Delete each comment
+      await Promise.all(commentsToDelete.map(async (comment) => {
+        try {
+          await axios.delete(`http://localhost:3000/comments/${comment.id}`);
+        } catch (err) {
+          console.error(`Error deleting comment with ID ${comment.id}`, err);
+        }
+      }));
+  
+      // Delete the post
       await axios.delete(`http://localhost:3000/posts/${postId}`);
-      setPosts(posts.filter(post => post.id !== postId));
+  
+      // Update the posts state
+      const updatedPosts = posts.filter(post => post.id !== postId);
+      setPosts(updatedPosts);
+      setFilteredPosts(updatedPosts); // Update filteredPosts as well
       if (selectedPost && selectedPost.id === postId) {
         setSelectedPost(null);
         setComments([]);
       }
     } catch (err) {
-      console.error('Error deleting post', err);
+      console.error('Error deleting post and comments', err);
     }
   };
 
   const handleSelectPost = async (post) => {
     setSelectedPost(post);
     setEditMode(false);
-    try {
-      const response = await axios.get(`http://localhost:3000/comments?postId=${post.id}`);
-      setComments(response.data);
-    } catch (err) {
-      console.error('Error fetching comments', err);
-    }
+    setCommentsVisible(false); // Hide comments initially when selecting a post
   };
 
   const handleUpdatePost = async () => {
@@ -92,9 +115,12 @@ const Posts = () => {
       const response = await axios.put(`http://localhost:3000/posts/${selectedPost.id}`, {
         title: updatedPostTitle,
         body: updatedPostBody,
-        userId: user.id,
+        userId: parseInt(user.id),
       });
-      setPosts(posts.map(post => (post.id === selectedPost.id ? response.data : post)));
+      const updatedPosts = posts.map(post => (post.id === selectedPost.id ? response.data : post));
+      setPosts(updatedPosts);
+      setFilteredPosts(updatedPosts); // Update filteredPosts as well
+      setSelectedPost(response.data); // Update the selected post immediately
       setEditMode(false);
     } catch (err) {
       console.error('Error updating post', err);
@@ -103,11 +129,18 @@ const Posts = () => {
 
   const handleAddComment = async () => {
     try {
+      // Fetch all comments to determine the max ID
+      const commentsResponse = await axios.get('http://localhost:3000/comments');
+      const allComments = commentsResponse.data;
+      const maxId = allComments.length > 0 ? Math.max(...allComments.map(comment => parseInt(comment.id))) : 0;
+
       const response = await axios.post('http://localhost:3000/comments', {
-        body: newComment,
-        postId: selectedPost.id,
+        postId: parseInt(selectedPost.id),
+        id: (maxId + 1).toString(),
         name: user.username,
         email: user.email,
+        body: newComment,
+        userID: parseInt(user.id)
       });
       setComments([...comments, response.data]);
       setNewComment('');
@@ -118,12 +151,20 @@ const Posts = () => {
 
   const handleDeleteComment = async (commentId) => {
     try {
-      await axios.delete(`http://localhost:3000/comments/${commentId}`);
-      setComments(comments.filter(comment => comment.id !== commentId));
+      const commentResponse = await axios.get(`http://localhost:3000/comments/${commentId}`);
+      const comment = commentResponse.data;
+      if (parseInt(comment.userID) === parseInt(user.id)) {
+        await axios.delete(`http://localhost:3000/comments/${commentId}`);
+        setComments(comments.filter(comment => comment.id !== commentId));
+      } else {
+        // Display an error message
+        alert('You can only delete comments you have written.');
+      }
     } catch (err) {
-      console.error('Error deleting comment', err);
+      console.error(`Error deleting comment with ID ${commentId}`, err);
     }
   };
+  
 
   const toggleEditMode = () => {
     setEditMode(!editMode);
@@ -133,18 +174,29 @@ const Posts = () => {
     }
   };
 
+  const toggleCommentsVisibility = async () => {
+    if (!commentsVisible) {
+      try {
+        const response = await axios.get(`http://localhost:3000/comments?postId=${selectedPost.id}`);
+        setComments(response.data);
+      } catch (err) {
+        console.error('Error fetching comments', err);
+      }
+    }
+    setCommentsVisible(!commentsVisible);
+  };
+
   return (
     <div className="posts-container">
       <h2>Posts</h2>
       <div className="search-bar">
         <input
-         className='search-box'
+          className='search-box'
           type="text"
           placeholder="Search by serial number or title"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <button onClick={handleSearch}><FaSearch /></button>
       </div>
       <div className="add-post">
         <input
@@ -161,10 +213,10 @@ const Posts = () => {
         <button onClick={handleAddPost}><FaPlus /> Add Post</button>
       </div>
       <ul className="posts-list">
-        {posts.map(post => (
+        {filteredPosts.map((post, index) => (
           <li key={post.id} className={selectedPost && selectedPost.id === post.id ? 'selected' : ''}>
             <div className="post-item">
-              <span>{post.id}. {post.title}</span>
+              <span>{index + 1}. {post.title}</span>
               <div className="post-actions">
                 <button onClick={() => handleSelectPost(post)}><FaComments /></button>
                 <button onClick={() => handleDeletePost(post.id)}><FaTrash /></button>
@@ -198,23 +250,32 @@ const Posts = () => {
             <button onClick={handleUpdatePost}><FaSave /> Save</button>
           )}
           <div className="comments-section">
-            <h4>Comments</h4>
-            <ul className="comments-list">
-              {comments.map(comment => (
-                <li key={comment.id}>
-                  <p><strong>{comment.name}</strong>: {comment.body}</p>
-                  {comment.email === user.email && (
-                    <button onClick={() => handleDeleteComment(comment.id)}><FaTrash /></button>
-                  )}
-                </li>
-              ))}
-            </ul>
-            <textarea
-              placeholder="Add a comment"
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-            />
-            <button onClick={handleAddComment}><FaPlus /> Add Comment</button>
+            <button onClick={toggleCommentsVisibility} className="toggle-comments">
+              {commentsVisible ? 'Hide Comments' : 'Show Comments'}
+            </button>
+            {commentsVisible && (
+              <div>
+                <h4>Comments</h4>
+                <ul className="comments-list">
+                  {comments.map(comment => (
+                    <li key={comment.id}>
+                      <div className="comment-item">
+                        <span>{comment.body}</span>
+                        <button onClick={() => handleDeleteComment(comment.id)}><FaTrash /></button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                <div className="add-comment">
+                  <textarea
+                    placeholder="Add a comment"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                  />
+                  <button onClick={handleAddComment}><FaPlus /> Add Comment</button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
