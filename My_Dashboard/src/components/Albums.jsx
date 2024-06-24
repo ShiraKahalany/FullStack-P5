@@ -6,6 +6,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight, faTimes } from '@fortawesome/free-solid-svg-icons';
 import albumBackground from '../img/album-background.jpg';
 import emptyAlbum from '../img/empty_album.png';
+import AddPhotoModal from './AddPhotoModel';
+import UpdatePhotoModal from './UpdatePhotoModal';
+
 import '../css/Albums.css';
 
 const Albums = () => {
@@ -16,7 +19,14 @@ const Albums = () => {
   const [photos, setPhotos] = useState([]);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [newAlbumTitle, setNewAlbumTitle] = useState('');
-  const [newPhoto, setNewPhoto] = useState(null); // New state for photo upload
+  const [newPhoto, setNewPhoto] = useState({ url: '' });
+  const [loading, setLoading] = useState(false);
+  const [totalPhotos, setTotalPhotos] = useState(0);
+  const [newPhotoTitle, setNewPhotoTitle] = useState('');
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [photoToUpdate, setPhotoToUpdate] = useState(null);
+  const [showAddPhotoModal, setShowAddPhotoModal] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,6 +34,24 @@ const Albums = () => {
       fetchAlbums();
     }
   }, [user]);
+
+  const openUpdateModal = (photo) => {
+    setPhotoToUpdate(photo);
+    setIsUpdateModalOpen(true);
+  };
+
+  const closeUpdateModal = () => {
+    setIsUpdateModalOpen(false);
+    setPhotoToUpdate(null);
+  };
+
+  const handleOpenAddPhotoModal = () => {
+    setShowAddPhotoModal(true);
+  };
+
+  const handleCloseAddPhotoModal = () => {
+    setShowAddPhotoModal(false);
+  };
 
   const fetchAlbums = async () => {
     try {
@@ -41,47 +69,65 @@ const Albums = () => {
   const handleAlbumClick = async (album) => {
     setSelectedAlbum(album);
     setCurrentPhotoIndex(0);
-    fetchPhotos(album.id);
+    await fetchTotalPhotos(album.id);
+    await fetchPhoto(album.id, 0);
   };
 
-  const fetchPhotos = async (albumId) => {
+  const fetchPhoto = async (albumId, index) => {
+    setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:3000/photos?albumId=${albumId}`);
+      const response = await axios.get(`http://localhost:3000/photos?albumId=${albumId}&_start=${index}&_limit=1`);
       setPhotos(response.data);
     } catch (err) {
-      console.error('Error fetching photos', err);
+      console.error('Error fetching photo', err);
+    }
+    setLoading(false);
+  };
+
+  const fetchTotalPhotos = async (albumId) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/photos?albumId=${albumId}`);
+      setTotalPhotos(response.data.length);
+    } catch (err) {
+      console.error('Error fetching total photos', err);
     }
   };
 
-  const handleNextPhoto = () => {
-    setCurrentPhotoIndex((prevIndex) => (prevIndex + 1) % photos.length);
+  const handleNextPhoto = async () => {
+    const nextIndex = (currentPhotoIndex + 1) % totalPhotos;
+    setCurrentPhotoIndex(nextIndex);
+    await fetchPhoto(selectedAlbum.id, nextIndex);
   };
 
-  const handlePreviousPhoto = () => {
-    setCurrentPhotoIndex((prevIndex) => (prevIndex - 1 + photos.length) % photos.length);
+  const handlePreviousPhoto = async () => {
+    const prevIndex = (currentPhotoIndex - 1 + totalPhotos) % totalPhotos;
+    setCurrentPhotoIndex(prevIndex);
+    await fetchPhoto(selectedAlbum.id, prevIndex);
   };
 
   const handleAddAlbum = async () => {
-    if (newAlbumTitle.trim()) {
-      try {
-        const { data: runningIdData } = await axios.get('http://localhost:3000/running_id?type=albums_id');
-        const newId = runningIdData[0].number;
+    if (newAlbumTitle.trim() === '') {
+      alert('Please enter an album title.');
+      return;
+    }
 
-        await axios.put('http://localhost:3000/running_id/1', {
-          type: 'albums_id',
-          number: newId + 1
-        });
+    try {
+      const { data: runningIdData } = await axios.get('http://localhost:3000/running_id?type=albums_id');
+      const maxId = albums.length > 0 ? Math.max(...albums.map(album => album.id)) : 0;
 
-        const response = await axios.post('http://localhost:3000/albums', {
-          id: newId,
-          userId: user.id,
-          title: newAlbumTitle,
-        });
-        setAlbums([...albums, response.data]);
-        setNewAlbumTitle('');
-      } catch (err) {
-        console.error('Error adding album', err);
-      }
+      const newAlbumData = {
+        id: maxId + 1,
+        userId: user.id,
+        title: newAlbumTitle,
+      };
+      const response = await axios.post('http://localhost:3000/albums', newAlbumData);
+
+      console.log('Album successfully added:', response.data);
+      setAlbums([...albums, response.data]);
+      setNewAlbumTitle('');
+    } catch (error) {
+      console.error('Error adding album:', error);
+      alert('Failed to add album. Please try again later.');
     }
   };
 
@@ -89,51 +135,59 @@ const Albums = () => {
     try {
       await axios.delete(`http://localhost:3000/photos/${photoId}`);
       setPhotos(photos.filter(photo => photo.id !== photoId));
+      handleNextPhoto();
     } catch (err) {
       console.error('Error deleting photo', err);
     }
   };
 
-  const handleUpdatePhoto = async (photoId, newTitle) => {
+  const handleUpdatePhoto = async (photoId, newTitle, newURL) => {
     try {
-      const response = await axios.patch(`http://localhost:3000/photos/${photoId}`, { title: newTitle });
+      const response = await axios.patch(`http://localhost:3000/photos/${photoId}`, {
+        title: newTitle,
+        url: newURL,
+        thumbnailUrl: newURL
+      });
       setPhotos(photos.map(photo => (photo.id === photoId ? response.data : photo)));
     } catch (err) {
       console.error('Error updating photo', err);
+      alert('Failed to update photo. Please try again later.');
     }
   };
 
-  const handleFileChange = (e) => {
-    setNewPhoto(e.target.files[0]);
+  const handleImageUrlChange = (e) => {
+    setNewPhoto({
+      ...newPhoto,
+      url: e.target.value,
+    });
   };
 
-  const handleUploadPhoto = async () => {
-    if (newPhoto && selectedAlbum) {
-      try {
-        const { data: runningIdData } = await axios.get('http://localhost:3000/running_id?type=photos_id');
-        const newId = runningIdData[0].number;
+  const handleAddPhoto = async (albumId, title, url) => {
+    if (url.trim() === '') {
+      alert('Please enter a photo URL.');
+      return;
+    }
 
-        await axios.put('http://localhost:3000/running_id/3', {
-          type: 'photos_id',
-          number: newId + 1
-        });
+    try {
+      const response = await axios.get('http://localhost:3000/photos');
+      const allPhotos = response.data;
+      const maxId = allPhotos.length > 0 ? Math.max(...allPhotos.map(photo => photo.id)) : 0;
+      const newPhotoData = {
+        albumId: albumId,
+        id: maxId + 1,
+        title: title,
+        url: url,
+        thumbnailUrl: url
+      };
 
-        const formData = new FormData();
-        formData.append('albumId', selectedAlbum.id);
-        formData.append('id', newId);
-        formData.append('title', newPhoto.name);
-        formData.append('url', URL.createObjectURL(newPhoto));
+      await axios.post('http://localhost:3000/photos', newPhotoData);
 
-        const response = await axios.post('http://localhost:3000/photos', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        setPhotos([...photos, response.data]);
-        setNewPhoto(null);
-      } catch (err) {
-        console.error('Error uploading photo', err);
-      }
+      // Fetch updated photos
+      await fetchTotalPhotos(albumId);
+      await fetchPhoto(albumId, totalPhotos);
+    } catch (error) {
+      console.error('Error adding new photo:', error);
+      alert('Failed to add photo. Please try again later.');
     }
   };
 
@@ -175,26 +229,38 @@ const Albums = () => {
             <div className="photo-display">
               {photos.length > 0 ? (
                 <>
-                  <img src={photos[currentPhotoIndex].thumbnailUrl} alt={photos[currentPhotoIndex].title} className="photo" />
-                  <p>{photos[currentPhotoIndex].title}</p>
-                  <input
-                    type="text"
-                    value={photos[currentPhotoIndex].title}
-                    onChange={(e) => handleUpdatePhoto(photos[currentPhotoIndex].id, e.target.value)}
-                    className="photo-title-input"
-                  />
-                  <button onClick={() => handleDeletePhoto(photos[currentPhotoIndex].id)} className="delete-photo-button">Delete</button>
+                  <img src={photos[0].thumbnailUrl} alt={photos[0].title} className="photo" />
+                  <p>{photos[0].title}</p>
+                  <div className="photo-update">
+                    <button onClick={() => openUpdateModal(photos[0])}>Update Photo</button>
+                  </div>
+                  <button onClick={() => handleDeletePhoto(photos[0].id)} className="delete-photo-button">Delete</button>
                 </>
               ) : (
                 <img src={emptyAlbum} alt="Empty Album" className="photo" />
               )}
-              <input type="file" onChange={handleFileChange} className="upload-input" />
-              <button onClick={handleUploadPhoto} className="upload-button">Upload Photo</button>
             </div>
             <FontAwesomeIcon icon={faArrowRight} className="arrow" onClick={handleNextPhoto} />
             <FontAwesomeIcon icon={faTimes} className="close-button" onClick={() => setSelectedAlbum(null)} />
           </div>
+          <button onClick={handleOpenAddPhotoModal} className="add-photo-button">Add Photo</button>
         </div>
+      )}
+
+      {showAddPhotoModal && (
+        <AddPhotoModal
+          albumId={selectedAlbum.id}
+          onAdd={handleAddPhoto}
+          onClose={handleCloseAddPhotoModal}
+        />
+      )}
+
+      {isUpdateModalOpen && (
+        <UpdatePhotoModal
+          photo={photoToUpdate}
+          onClose={closeUpdateModal}
+          onUpdate={handleUpdatePhoto}
+        />
       )}
     </div>
   );

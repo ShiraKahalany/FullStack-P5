@@ -1,6 +1,8 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import AuthContext from '../contexts/AuthContext';
+import axios from 'axios';
+
 
 const CompleteProfile = () => {
   const navigate = useNavigate();
@@ -66,10 +68,18 @@ const CompleteProfile = () => {
       body: JSON.stringify(completeUserData)
     })
     .then(response => response.json())
-    .then(data => {
-        setUser(username);
-        localStorage.setItem('user', JSON.stringify(username));
-        navigate('/login');
+    .then(async data => {
+        try {
+            const response = await axios.get(`http://localhost:3000/users?username=${username}`);
+            const user = response.data[0];
+            
+            setUser(user);
+            localStorage.setItem('user', JSON.stringify(user));
+            navigate('/home');
+          } catch (err) {
+            console.error('Login error', err);
+            setError('An error occurred. Please try again.');
+          }
     })
     .catch((error) => {
       console.error('Error:', error);

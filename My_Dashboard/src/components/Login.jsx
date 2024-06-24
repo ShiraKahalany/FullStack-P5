@@ -1,4 +1,3 @@
-// src/components/Login.jsx
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -18,8 +17,8 @@ const Login = () => {
       const response = await axios.get(`http://localhost:3000/users?username=${username}`);
       const user = response.data[0];
       if (user && user.website === password) {
-        console.log('User logged in:', user);
-        console.log(user.website);
+        // console.log('User logged in:', user);
+        // console.log(user.website);
         setUser(user);
         localStorage.setItem('user', JSON.stringify(user));
         navigate('/home');
