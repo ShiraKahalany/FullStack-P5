@@ -1501,7 +1501,7 @@
     {
       "title": "eum et est occaecati",
       "body": "ullam et saepe reiciendis voluptatem adipisci\nsit amet autem assumenda provident rerum culpa\nquis hic commodi nesciunt rem tenetur doloremque ipsam iure\nquis sunt voluptatem rerum illo velit",
-      "userId": "1",
+      "userId": 1,
       "id": "4"
     },
     {
@@ -2079,6 +2079,7 @@
       "id": "100",
       "title": "at nam consequatur ea labore ea harum",
       "body": "cupiditate quo est a modi nesciunt soluta\nipsa voluptas error itaque dicta in\nautem qui minus magnam et distinctio eum\naccusamus ratione error aut"
+<<<<<<< HEAD
     },
     {
       "id": "[object Object]1",
@@ -2103,6 +2104,8 @@
       "title": "",
       "body": "",
       "userId": "1"
+=======
+>>>>>>> ee745f24e4f04cf87f1d9a7757bbf103cef6a66c
     }
   ],
   "comments": [
@@ -6607,6 +6610,67 @@
       "userId": 10,
       "id": "100",
       "title": "enim repellat iste"
+<<<<<<< HEAD
+=======
+    },
+    {
+      "id": "0da4",
+      "userId": 1,
+      "title": "shira album"
+    },
+    {
+      "id": "f87b",
+      "userId": 1,
+      "title": "shira2 album"
+    },
+    {
+      "id": {
+        "data": [
+          {
+            "type": "albums_id",
+            "number": 110
+          }
+        ],
+        "status": 200,
+        "statusText": "OK",
+        "headers": {
+          "content-length": "54",
+          "content-type": "application/json"
+        },
+        "config": {
+          "transitional": {
+            "silentJSONParsing": true,
+            "forcedJSONParsing": true,
+            "clarifyTimeoutError": false
+          },
+          "adapter": [
+            "xhr",
+            "http",
+            "fetch"
+          ],
+          "transformRequest": [
+            null
+          ],
+          "transformResponse": [
+            null
+          ],
+          "timeout": 0,
+          "xsrfCookieName": "XSRF-TOKEN",
+          "xsrfHeaderName": "X-XSRF-TOKEN",
+          "maxContentLength": -1,
+          "maxBodyLength": -1,
+          "env": {},
+          "headers": {
+            "Accept": "application/json, text/plain, */*"
+          },
+          "method": "get",
+          "url": "http://localhost:3000/running_id?type=albums_id"
+        },
+        "request": {}
+      },
+      "userId": 1,
+      "title": "family"
+>>>>>>> ee745f24e4f04cf87f1d9a7757bbf103cef6a66c
     }
   ],
   "photos": [

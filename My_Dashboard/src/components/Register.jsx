@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import '../css/Register.css'; // Import the CSS file
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -39,23 +40,49 @@ const Register = () => {
   };
 
   return (
-    <div>
-      <h2>Register</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Username:</label>
-          <input type="text" name="username" value={formData.username} onChange={handleChange} required />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input type="password" name="password" value={formData.password} onChange={handleChange} required />
-        </div>
-        <div>
-          <label>Verify Password:</label>
-          <input type="password" name="passwordVerify" value={formData.passwordVerify} onChange={handleChange} required />
-        </div>
-        <button type="submit">Register</button>
-      </form>
+    <div className="register-page">
+      <main role="main" className="main">
+        <h1>Register</h1>
+        <h3>Please fill in the form to create an account.</h3>
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="username">Username:</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            placeholder="Enter your Username"
+            required
+          />
+          <label htmlFor="password">Password:</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Enter your Password"
+            required
+          />
+          <label htmlFor="passwordVerify">Verify Password:</label>
+          <input
+            type="password"
+            id="passwordVerify"
+            name="passwordVerify"
+            value={formData.passwordVerify}
+            onChange={handleChange}
+            placeholder="Verify your Password"
+            required
+          />
+          <div className="wrap">
+            <button type="submit" id="registerSubmit" name="registerSubmit" className="submit-button">
+              Register
+            </button>
+          </div>
+        </form>
+        <p>Already have an account? <a href="/login">Sign in</a></p>
+      </main>
     </div>
   );
 };
