@@ -33,7 +33,6 @@ const Login = () => {
   };
 
   return (
-<<<<<<< HEAD
     <div className="login-page">
       <main role="main" className="main">
         <h1>Sign In</h1>
@@ -41,15 +40,6 @@ const Login = () => {
         {error && <p className="error-message">{error}</p>}
         <form onSubmit={handleLogin}>
           <label htmlFor="username">Username:</label>
-=======
-    <div className="login-container">
-      <h2>Login</h2>
-      {error && <p className="error-message">{error}</p>}
-      <form onSubmit={handleLogin}>
-        <div className="form-group">
-          <label htmlFor="username">
-          </label>
->>>>>>> 67536add1f48c65c4c3cf50408e01d60378c709f
           <input
             type="text"
             id="username"

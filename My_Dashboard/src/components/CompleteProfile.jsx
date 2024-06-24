@@ -69,7 +69,7 @@ const CompleteProfile = () => {
     .then(data => {
         setUser(username);
         localStorage.setItem('user', JSON.stringify(username));
-        navigate('/home');
+        navigate('/login');
     })
     .catch((error) => {
       console.error('Error:', error);
@@ -129,7 +129,7 @@ const CompleteProfile = () => {
           <label>BS:</label>
           <input type="text" name="company.bs" value={profileData.company.bs} onChange={handleChange} />
         </div>
-        <button type="submit">Complete Registration</button>
+        <button type="submit" >Complete Registration</button>
       </form>
     </div>
   );
