@@ -1,7 +1,7 @@
 /* src/css/Posts.css */
 .posts-container {
   padding: 20px;
-  max-width: 800px;
+  width: 600px;
   margin: 0 auto;
   font-family: Arial, sans-serif;
 }
