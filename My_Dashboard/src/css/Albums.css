@@ -116,6 +116,10 @@
   display: flex;
   align-items: center;
   z-index: 1001;
+  width: 90%;
+  max-width: 800px;
+  min-height: 500px;
+  justify-content: space-between;
 }
 
 .arrow {
@@ -130,10 +134,13 @@
   flex-direction: column;
   align-items: center;
   color: white;
+  flex: 1;
+  margin: 0 1rem;
+  min-height: 300px;
 }
 
 .photo {
-  max-width: 90%;
+  max-width: 100%;
   max-height: 80vh;
   margin-bottom: 20px;
 }
@@ -167,7 +174,7 @@
 }
 
 .add-photo-button {
-  padding: 10px;
+  padding: 5px 10px; /* Adjusted padding to make the button shorter */
   background-color: #007bff;
   color: white;
   border: none;

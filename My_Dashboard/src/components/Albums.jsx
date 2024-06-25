@@ -110,14 +110,13 @@ const Albums = () => {
     }
 
     try {
-      const { data: runningIdData } = await axios.get('http://localhost:3000/running_id?type=albums_id');
       const albumsData = await axios.get('http://localhost:3000/albums');
       const allAlbums = albumsData.data;
       const maxId = allAlbums.length > 0 ? Math.max(...allAlbums.map(album => parseInt(album.id, 10))) : 0;
       const newId = maxId + 1;
   
       const newAlbumData = {
-        id: String(newId),  
+        id: (newId).toString(),  
         userId: parseInt(user.id),  
         title: newAlbumTitle,
       };
@@ -127,7 +126,6 @@ const Albums = () => {
       setNewAlbumTitle('');
     } catch (error) {
       console.error('Error adding album:', error);
-      alert('Failed to add album. Please try again later.');
     }
   };
 
@@ -175,7 +173,6 @@ const Albums = () => {
       setPhotos(photos.map(photo => (photo.id === photoId ? response.data : photo)));
     } catch (err) {
       console.error('Error updating photo', err);
-      alert('Failed to update photo. Please try again later.');
     }
   };
 
@@ -190,8 +187,8 @@ const Albums = () => {
       const allPhotos = response.data;
       const maxId = allPhotos.length > 0 ? Math.max(...allPhotos.map(photo => photo.id)) : 0;
       const newPhotoData = {
-        albumId: albumId,
-        id: maxId + 1,
+        albumId: parseInt(albumId),
+        id: (maxId + 1).toString(),
         title: title,
         url: url,
         thumbnailUrl: url

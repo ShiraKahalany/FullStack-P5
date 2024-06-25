@@ -1,45 +1,40 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-// import '../css/PhotoModal.css';
+import '../css/AddPhotoModal.css';
 
 const AddPhotoModal = ({ albumId, onAdd, onClose }) => {
-  const [title, setTitle] = useState('');
-  const [url, setUrl] = useState('');
+  const [photoUrl, setPhotoUrl] = useState('');
+  const [photoTitle, setPhotoTitle] = useState('');
 
-  const handleAdd = () => {
-    onAdd(albumId, title, url);
-    setTitle('');
-    setUrl('');
+  const handleAddPhoto = () => {
+    onAdd(albumId, photoTitle, photoUrl);
     onClose();
   };
 
   return (
     <div className="modal-overlay">
-      <div className="modal">
-        <h2>Add Photo</h2>
-        <label>Title:</label>
+      <div className="modal-content">
+        <h2 className="modal-title">Add Photo</h2>
         <input
           type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Add Title"
+          value={photoTitle}
+          onChange={(e) => setPhotoTitle(e.target.value)}
+          className="modal-input"
         />
-        <label>URL:</label>
         <input
           type="text"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          placeholder="Add URL"
+          value={photoUrl}
+          onChange={(e) => setPhotoUrl(e.target.value)}
+          className="modal-input"
         />
-        <button onClick={handleAdd}>Add</button>
-        <button onClick={onClose}>Cancel</button>
+        <div className="modal-buttons">
+          <button onClick={handleAddPhoto} className="add-photo-button">Add</button>
+          <button onClick={onClose} className="close-button">Cancel</button>
+        </div>
       </div>
     </div>
   );
-};
-
-AddPhotoModal.propTypes = {
-  albumId: PropTypes.number.isRequired,
-  onAdd: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
 };
 
 export default AddPhotoModal;
