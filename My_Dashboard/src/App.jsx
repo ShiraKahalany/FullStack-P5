@@ -9,22 +9,24 @@ import Posts from './components/Posts';
 import Albums from './components/Albums';
 import Info from './components/Info';
 import CompleteProfile from './components/CompleteProfile';
+import NavBar from './components/NavBar'; // Import NavBar
 import { AuthProvider } from './contexts/AuthContext';
+import PrivateRoute from './components/PrivateRoute';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
+        <NavBar /> {/* Include NavBar */}
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/completeProfile" element={<CompleteProfile />} />
-          <Route path="/home" element={<Home />}>
-          <Route path="todos" element={<Todos />} />
-          <Route path="posts" element={<Posts />} />
-          <Route path="albums" element={<Albums />} />
-          <Route path="info" element={<Info />} />
-          </Route>
+          <Route path="/users/:userId/home" element={<PrivateRoute><Home /></PrivateRoute>} />
+          <Route path="/users/:userId/todos" element={<PrivateRoute><Todos /></PrivateRoute>} />
+          <Route path="/users/:userId/posts" element={<PrivateRoute><Posts /></PrivateRoute>} />
+          <Route path="/users/:userId/albums" element={<PrivateRoute><Albums /></PrivateRoute>} />
+          <Route path="/users/:userId/info" element={<PrivateRoute><Info /></PrivateRoute>} />
           <Route path="/" element={<Login />} />
         </Routes>
       </Router>

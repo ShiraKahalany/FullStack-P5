@@ -51,40 +51,37 @@ const CompleteProfile = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const completeUserData = {
       username,
-      website: password, // Set the website field to the password
+      password, // Save the password for login purposes
       ...profileData
     };
 
-    fetch('http://localhost:3000/users', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(completeUserData)
-    })
-    .then(response => response.json())
-    .then(async data => {
-        try {
-            const response = await axios.get(`http://localhost:3000/users?username=${username}`);
-            const user = response.data[0];
-            
-            setUser(user);
-            localStorage.setItem('user', JSON.stringify(user));
-            navigate('/home');
-          } catch (err) {
-            console.error('Login error', err);
-            setError('An error occurred. Please try again.');
-          }
-    })
-    .catch((error) => {
+    try {
+      const response = await fetch('http://localhost:3000/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(completeUserData)
+      });
+      const userData = await response.json();
+
+      // Simulate login by fetching the user and setting it in context and local storage
+      const loginResponse = await axios.get(`http://localhost:3000/users?username=${username}`);
+      const user = loginResponse.data[0];
+
+      setUser(user);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      navigate(`/users/${user.id}/home`);
+    } catch (error) {
       console.error('Error:', error);
       alert('Failed to complete registration');
-    });
+    }
   };
 
   return (

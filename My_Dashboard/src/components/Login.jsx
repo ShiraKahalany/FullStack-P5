@@ -17,11 +17,9 @@ const Login = () => {
       const response = await axios.get(`http://localhost:3000/users?username=${username}`);
       const user = response.data[0];
       if (user && user.website === password) {
-        // console.log('User logged in:', user);
-        // console.log(user.website);
         setUser(user);
         localStorage.setItem('user', JSON.stringify(user));
-        navigate('/home');
+        navigate(`/users/${user.id}/home`);
       } else {
         setError('Invalid username or password');
       }

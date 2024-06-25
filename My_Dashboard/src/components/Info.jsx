@@ -1,16 +1,18 @@
 // src/components/Info.jsx
 import React, { useContext, useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import AuthContext from '../contexts/AuthContext';
 import axios from 'axios';
-import '../css/Info.css'; // Import the CSS file for styling
+import '../css/Info.css';
 
 const Info = () => {
   const { user } = useContext(AuthContext);
+  const { userId } = useParams();
   const [userInfo, setUserInfo] = useState(null);
 
   useEffect(() => {
     if (user && user.id) {
-      axios.get(`http://localhost:3000/users/${user.id}`)
+      axios.get(`http://localhost:3000/users/${userId}`)
         .then(response => {
           setUserInfo(response.data);
         })
@@ -18,7 +20,7 @@ const Info = () => {
           console.error('There was an error fetching the user data!', error);
         });
     }
-  }, [user]);
+  }, [user, userId]);
 
   if (!userInfo) {
     return <div>Loading...</div>;

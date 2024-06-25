@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import AuthContext from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -13,6 +14,7 @@ import '../css/Albums.css';
 
 const Albums = () => {
   const { user } = useContext(AuthContext);
+  const { userId } = useParams();
   const [albums, setAlbums] = useState([]);
   const [search, setSearch] = useState('');
   const [selectedAlbum, setSelectedAlbum] = useState(null);
@@ -31,7 +33,7 @@ const Albums = () => {
     if (user) {
       fetchAlbums();
     }
-  }, [user]);
+  }, [user, userId]);
 
   const openUpdateModal = (photo) => {
     setPhotoToUpdate(photo);
@@ -53,7 +55,7 @@ const Albums = () => {
 
   const fetchAlbums = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/albums?userId=${user.id}`);
+      const response = await axios.get(`http://localhost:3000/albums?userId=${userId}`);
       setAlbums(response.data);
     } catch (err) {
       console.error('Error fetching albums', err);
@@ -117,7 +119,7 @@ const Albums = () => {
   
       const newAlbumData = {
         id: (newId).toString(),  
-        userId: parseInt(user.id),  
+        userId: parseInt(userId),  
         title: newAlbumTitle,
       };
 
@@ -136,6 +138,7 @@ const Albums = () => {
   
       await Promise.all(photosToDelete.map(async (photo) => {
         try {
+          console.log(`Deleting photo with ID ${photo.id}`);
           await axios.delete(`http://localhost:3000/photos/${photo.id}`);
         } catch (err) {
           console.error(`Error deleting photo with ID ${photo.id}`, err);

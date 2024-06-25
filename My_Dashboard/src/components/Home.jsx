@@ -1,5 +1,5 @@
-import React, { useContext, useEffect } from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import React, { useContext, useEffect, useState } from 'react';
+import { Outlet, useNavigate, useLocation, useParams } from 'react-router-dom';
 import Navbar from './NavBar';
 import AuthContext from '../contexts/AuthContext';
 import '../css/Home.css';
@@ -8,16 +8,26 @@ const Home = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const location = useLocation();
+  const { userId } = useParams();
+  const [isUserLoaded, setIsUserLoaded] = useState(false);
 
   useEffect(() => {
-    if (!user && location.pathname === '/home') {
-      // Redirect to login if no user and on home page
+    if (!user) {
+      // Redirect to login if no user
       navigate('/login');
-    } 
-  }, [user, location, navigate]);
+    } else {
+      setIsUserLoaded(true);
+    }
+  }, [user, navigate]);
 
-  // Render welcome message and user's name only on the home page
-  const renderWelcome = location.pathname === '/home';
+  useEffect(() => {
+    if (isUserLoaded && location.pathname === `/users/${userId}/home`) {
+      setIsUserLoaded(true);
+    }
+  }, [location.pathname, userId, isUserLoaded]);
+
+  // Render welcome message and user's name only on the user-specific home page
+  const renderWelcome = location.pathname === `/users/${userId}/home` && isUserLoaded;
 
   return (
     <div>

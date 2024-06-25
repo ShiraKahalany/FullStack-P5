@@ -3,7 +3,7 @@ import '../css/UpdatePhotoModal.css';
 
 const UpdatePhotoModal = ({ photo, onUpdate, onClose }) => {
   const [newTitle, setNewTitle] = useState(photo.title);
-  const [newURL, setNewURL] = useState(photo.url);
+  const [newURL, setNewURL] = useState(photo.thumbnailUrl);
 
   const handleUpdatePhoto = () => {
     onUpdate(photo.id, newTitle, newURL);

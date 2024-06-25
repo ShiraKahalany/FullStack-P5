@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useParams } from 'react-router-dom';
 import AuthContext from '../contexts/AuthContext';
 import axios from 'axios';
-import '../css/Todos.css'; // Import the CSS file
+import '../css/Todos.css';
 
 const Todos = () => {
   const { user } = useContext(AuthContext);
+  const { userId } = useParams();
   const [todos, setTodos] = useState([]);
   const [sortBy, setSortBy] = useState('serial');
   const [newTaskTitle, setNewTaskTitle] = useState('');
@@ -16,7 +18,7 @@ const Todos = () => {
   useEffect(() => {
     const fetchTodos = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/todos?userId=${user.id}`);
+        const response = await axios.get(`http://localhost:3000/todos?userId=${userId}`);
         let userTodos = response.data;
 
         // Apply sorting
@@ -47,7 +49,7 @@ const Todos = () => {
     };
 
     fetchTodos();
-  }, [user.id, sortBy, searchTitle, searchStatus]);
+  }, [userId, sortBy, searchTitle, searchStatus]);
 
   const handleSortChange = (event) => {
     setSortBy(event.target.value);
@@ -64,7 +66,7 @@ const Todos = () => {
       const allTodos = response.data;
       const maxId = allTodos.length > 0 ? Math.max(...allTodos.map(todo => todo.id)) : 0;
       const newTask = {
-        userId: parseInt(user.id),
+        userId: parseInt(userId),
         id: String(maxId + 1),
         title: newTaskTitle,
         completed: false

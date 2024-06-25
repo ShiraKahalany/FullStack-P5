@@ -14,14 +14,16 @@ function NavBar() {
   return (
     <nav className="navbar">
       <div className="navbar-logo">
-        <Link to="/home">My Dashboard</Link>
+        {user && <Link to={`/users/${user.id}/home`}>My Dashboard</Link>}
       </div>
-      <div className="navbar-links">
-        <Link to="/home/info">Info</Link>
-        <Link to="/home/todos">Todos</Link>
-        <Link to="/home/posts">Posts</Link>
-        <Link to="/home/albums">Albums</Link>
-      </div>
+      {user && (
+        <div className="navbar-links">
+          <Link to={`/users/${user.id}/info`}>Info</Link>
+          <Link to={`/users/${user.id}/todos`}>Todos</Link>
+          <Link to={`/users/${user.id}/posts`}>Posts</Link>
+          <Link to={`/users/${user.id}/albums`}>Albums</Link>
+        </div>
+      )}
       {user && (
         <div className="navbar-user">
           <span>{user.name}</span>

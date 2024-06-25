@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { FaEdit, FaTrash, FaComments, FaSave, FaPlus } from 'react-icons/fa';
 import AuthContext from '../contexts/AuthContext';
@@ -6,6 +7,7 @@ import '../css/Posts.css';
 
 const Posts = () => {
   const { user } = useContext(AuthContext);
+  const { userId } = useParams();
   const [posts, setPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
@@ -25,7 +27,7 @@ const Posts = () => {
     if (user) {
       fetchPosts();
     }
-  }, [user]);
+  }, [user, userId]);
 
   useEffect(() => {
     handleSearch();
@@ -33,26 +35,13 @@ const Posts = () => {
 
   const fetchPosts = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/posts?userId=${user.id}`);
+      const response = await axios.get(`http://localhost:3000/posts?userId=${userId}`);
       setPosts(response.data);
       setFilteredPosts(response.data); // Initialize filteredPosts with all posts
     } catch (err) {
       console.error('Error fetching posts', err);
     }
   };
-
-  // const handleSearch = () => {
-  //   if (searchQuery.trim() === '') {
-  //     setFilteredPosts(posts);
-  //   } else {
-  //     const filtered = posts.filter(
-  //       post =>
-  //         post.id.toString().includes(searchQuery) ||
-  //         post.title.toLowerCase().includes(searchQuery.toLowerCase())
-  //     );
-  //     setFilteredPosts(filtered);
-  //   }
-  // };
 
   const handleSearch = () => {
     if (searchQuery.trim() === '') {
@@ -76,7 +65,7 @@ const Posts = () => {
         id: (maxpostId+1).toString(),
         title: newPostTitle,
         body: newPostBody,
-        userId: parseInt(user.id),
+        userId: parseInt(userId),
       });
       const newPosts = [...posts, response.data];
       setPosts(newPosts);
@@ -130,7 +119,7 @@ const Posts = () => {
       const response = await axios.put(`http://localhost:3000/posts/${selectedPost.id}`, {
         title: updatedPostTitle,
         body: updatedPostBody,
-        userId: parseInt(user.id),
+        userId: parseInt(userId),
       });
       const updatedPosts = posts.map(post => (post.id === selectedPost.id ? response.data : post));
       setPosts(updatedPosts);
