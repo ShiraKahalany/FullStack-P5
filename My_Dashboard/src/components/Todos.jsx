@@ -185,8 +185,9 @@ const Todos = () => {
 
       {/* List of todos */}
       <ul className="todos-list">
-        {todos.map(todo => (
+        {todos.map((todo, index) => (
           <li key={todo.id} className="todo-item">
+            <span className="todo-serial-number">{index + 1}.</span>
             <input
               type="checkbox"
               checked={todo.completed}
