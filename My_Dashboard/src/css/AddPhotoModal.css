@@ -36,11 +36,11 @@
 }
 
 .modal-buttons {
-  display: flex;
+  display: inherit;
   justify-content: space-between;
 }
 
-.add-photo-button {
+.add-photo-button-2 {
   padding: 10px 20px;
   background-color: #007bff;
   color: white;
@@ -48,6 +48,9 @@
   border-radius: 5px;
   cursor: pointer;
   margin-right: 10px;
+  width: 89.81px;
+  height: 38.4px;
+  font-size: 16px;
 }
 
 .add-photo-button:hover {

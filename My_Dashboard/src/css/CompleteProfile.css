@@ -20,6 +20,7 @@
     transition: transform 0.2s;
     width: 360px;
     text-align: center;
+    margin-top: 80px;
   }
   
   .complete-profile-page h1 {

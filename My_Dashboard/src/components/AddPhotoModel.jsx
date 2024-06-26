@@ -29,7 +29,7 @@ const AddPhotoModal = ({ albumId, onAdd, onClose }) => {
           className="modal-input"
         />
         <div className="modal-buttons">
-          <button onClick={handleAddPhoto} className="add-photo-button">Add</button>
+          <button onClick={handleAddPhoto} className="add-photo-button-2">Add</button>
           <button onClick={onClose} className="close-button">Cancel</button>
         </div>
       </div>
