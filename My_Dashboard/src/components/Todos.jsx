@@ -98,7 +98,7 @@ const Todos = () => {
       if (!taskToUpdate) return;
 
       const updatedTask = { ...taskToUpdate, completed };
-      await axios.put(`http://localhost:3000/todos/${taskId}`, updatedTask);
+      await axios.patch(`http://localhost:3000/todos/${taskId}`, updatedTask);
 
       setTodos(todos.map(todo => (todo.id === taskId ? updatedTask : todo)));
     } catch (error) {
@@ -129,7 +129,7 @@ const Todos = () => {
 
     try {
       const updatedTask = { ...editingTask, title: editedTitle };
-      await axios.put(`http://localhost:3000/todos/${editingTask.id}`, updatedTask);
+      await axios.patch(`http://localhost:3000/todos/${editingTask.id}`, updatedTask);
 
       setTodos(todos.map(todo => (todo.id === editingTask.id ? updatedTask : todo)));
       setEditingTask(null);

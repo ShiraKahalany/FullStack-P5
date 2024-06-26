@@ -116,10 +116,9 @@ const Posts = () => {
 
   const handleUpdatePost = async () => {
     try {
-      const response = await axios.put(`http://localhost:3000/posts/${selectedPost.id}`, {
+      const response = await axios.patch(`http://localhost:3000/posts/${selectedPost.id}`, {
         title: updatedPostTitle,
-        body: updatedPostBody,
-        userId: parseInt(userId),
+        body: updatedPostBody
       });
       const updatedPosts = posts.map(post => (post.id === selectedPost.id ? response.data : post));
       setPosts(updatedPosts);
@@ -183,7 +182,7 @@ const Posts = () => {
     try {
       const commentResponse = await axios.get(`http://localhost:3000/comments/${commentId}`);
       const comment = commentResponse.data;
-      const response = await axios.put(`http://localhost:3000/comments/${commentId}`, {
+      const response = await axios.patch(`http://localhost:3000/comments/${commentId}`, {
         ...comment,
         body: updatedComment
       });
