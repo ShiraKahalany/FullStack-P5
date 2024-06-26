@@ -31,7 +31,6 @@ const Info = () => {
           <p><strong>Username:</strong> {userInfo.username}</p>
           <p><strong>Email:</strong> {userInfo.email}</p>
           <p><strong>Phone:</strong> {userInfo.phone}</p>
-          <p><strong>Website:</strong> <a href={`http://${userInfo.website}`} target="_blank" rel="noopener noreferrer">{userInfo.website}</a></p>
         </div>
         <div className="info-section">
           <h3>Address</h3>
