@@ -2,7 +2,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import AuthContext from '../contexts/AuthContext';
-import axios from 'axios';
 import '../css/Info.css';
 
 const Info = () => {
@@ -12,13 +11,11 @@ const Info = () => {
 
   useEffect(() => {
     if (user && user.id) {
-      axios.get(`http://localhost:3000/users/${userId}`)
-        .then(response => {
-          setUserInfo(response.data);
-        })
-        .catch(error => {
-          console.error('There was an error fetching the user data!', error);
-        });
+      const localStorageUser = localStorage.getItem('user');
+      if (localStorageUser) {
+        const parsedUser = JSON.parse(localStorageUser);
+        setUserInfo(parsedUser);
+      }
     }
   }, [user, userId]);
 

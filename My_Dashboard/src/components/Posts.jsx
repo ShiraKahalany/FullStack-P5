@@ -22,6 +22,7 @@ const Posts = () => {
   const [commentsVisible, setCommentsVisible] = useState(false);
   const [editCommentId, setEditCommentId] = useState(null);
   const [updatedComment, setUpdatedComment] = useState('');
+  const [commentsCache, setCommentsCache] = useState({});
 
   useEffect(() => {
     if (user) {
@@ -54,7 +55,6 @@ const Posts = () => {
       setFilteredPosts(filtered);
     }
   };
-  
 
   const handleAddPost = async () => {
     try {
@@ -62,7 +62,7 @@ const Posts = () => {
       const allPosts = postssResponse.data;
       const maxpostId = allPosts.length > 0 ? Math.max(...allPosts.map(post => parseInt(post.id))) : 0;
       const response = await axios.post('http://localhost:3000/posts', {
-        id: (maxpostId+1).toString(),
+        id: (maxpostId + 1).toString(),
         title: newPostTitle,
         body: newPostBody,
         userId: parseInt(userId),
@@ -82,7 +82,7 @@ const Posts = () => {
       // Fetch all comments for the post
       const commentsResponse = await axios.get(`http://localhost:3000/comments?postId=${postId}`);
       const commentsToDelete = commentsResponse.data;
-  
+
       // Delete each comment
       await Promise.all(commentsToDelete.map(async (comment) => {
         try {
@@ -91,10 +91,10 @@ const Posts = () => {
           console.error(`Error deleting comment with ID ${comment.id}`, err);
         }
       }));
-  
+
       // Delete the post
       await axios.delete(`http://localhost:3000/posts/${postId}`);
-  
+
       // Update the posts state
       const updatedPosts = posts.filter(post => post.id !== postId);
       setPosts(updatedPosts);
@@ -147,6 +147,11 @@ const Posts = () => {
       });
       setComments([...comments, response.data]);
       setNewComment('');
+      // Update comments cache
+      setCommentsCache(prev => ({
+        ...prev,
+        [selectedPost.id]: [...comments, response.data]
+      }));
     } catch (err) {
       console.error('Error adding comment', err);
     }
@@ -159,6 +164,11 @@ const Posts = () => {
       if (parseInt(comment.userID) === parseInt(user.id)) {
         await axios.delete(`http://localhost:3000/comments/${commentId}`);
         setComments(comments.filter(comment => comment.id !== commentId));
+        // Update comments cache
+        setCommentsCache(prev => ({
+          ...prev,
+          [selectedPost.id]: comments.filter(comment => comment.id !== commentId)
+        }));
       } else {
         // Display an error message
         alert('You can only delete comments you have written.');
@@ -183,12 +193,16 @@ const Posts = () => {
       const commentResponse = await axios.get(`http://localhost:3000/comments/${commentId}`);
       const comment = commentResponse.data;
       const response = await axios.patch(`http://localhost:3000/comments/${commentId}`, {
-        ...comment,
         body: updatedComment
       });
       setComments(comments.map(comment => (comment.id === commentId ? response.data : comment)));
       setEditCommentId(null);
       setUpdatedComment('');
+      // Update comments cache
+      setCommentsCache(prev => ({
+        ...prev,
+        [selectedPost.id]: comments.map(comment => (comment.id === commentId ? response.data : comment))
+      }));
     } catch (err) {
       console.error(`Error updating comment with ID ${commentId}`, err);
     }
@@ -209,11 +223,22 @@ const Posts = () => {
 
   const toggleCommentsVisibility = async () => {
     if (!commentsVisible) {
-      try {
-        const response = await axios.get(`http://localhost:3000/comments?postId=${selectedPost.id}`);
-        setComments(response.data);
-      } catch (err) {
-        console.error('Error fetching comments', err);
+      // Fetch comments only if they are not already cached
+      if (!commentsCache[selectedPost.id]) {
+        try {
+          const response = await axios.get(`http://localhost:3000/comments?postId=${selectedPost.id}`);
+          setComments(response.data);
+          // Cache the comments
+          setCommentsCache(prev => ({
+            ...prev,
+            [selectedPost.id]: response.data
+          }));
+        } catch (err) {
+          console.error('Error fetching comments', err);
+        }
+      } else {
+        // Use cached comments
+        setComments(commentsCache[selectedPost.id]);
       }
     }
     setCommentsVisible(!commentsVisible);
@@ -304,14 +329,14 @@ const Posts = () => {
                               onChange={(e) => setUpdatedComment(e.target.value)}
                             />
                             <div className='commentCandS'>
-                            <button onClick={() => handleUpdateComment(comment.id)}><FaSave /> Save</button>
-                            <button onClick={handleCancelEditComment}>Cancel</button>
+                              <button onClick={() => handleUpdateComment(comment.id)}><FaSave /> Save</button>
+                              <button onClick={handleCancelEditComment}>Cancel</button>
                             </div>
                           </div>
                         ) : (
                           <span>{comment.body}</span>
                         )}
-                        {editCommentId !== comment.id && (
+                        {editCommentId !== comment.id && parseInt(comment.userID) === parseInt(user.id) && (
                           <div className='commentsSandE'>
                             <button onClick={() => handleEditComment(comment.id, comment.body)}><FaEdit /></button>
                             <button onClick={() => handleDeleteComment(comment.id)}><FaTrash /></button>
