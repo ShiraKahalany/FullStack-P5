@@ -43,11 +43,3 @@ Dynamic Dashboard is an intuitive web application that serves as a user-friendly
    `npm install`
 2. Start development server:  
    `npm run dev`
-
-## 📸 Suggested Screenshots
-- **Auth Page**  
-- **Dashboard Page**  
-- **Home Page**  
-- **Login Page**  
-- **Main Page**  
-- **Profile Page**  
